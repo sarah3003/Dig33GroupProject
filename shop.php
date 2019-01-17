@@ -1,13 +1,26 @@
 <?php
-    // Contains database connection information
+    // config.php contains database connection information, tools.php does xyz
 	require "config.php";
+	require "tools.php";
 	
 	// Get category from header 
 	$category = ($_GET['category']);
 	
 	// Query to search database for items included in $category
 	$query = "SELECT * FROM products";
+	
+	// Add where to query if category is not 'All'
+	if($category == "Sparkling" || $category == "Still"){
+		$query .= " WHERE category = \"$category\" ";
+	}
+	
+	// Search database
 	$result = mysqli_query($connection,$query);
+	
+	// Display error if database query was unsuccessful
+	if(!$result){
+		die(mysqli_errno() . " Database query failed.");
+	}
 ?>
 
 <!DOCTYPE html>
@@ -21,8 +34,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
+    <!-- Add icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <title>Shop - Feel Good Drinks Co.</title>
     </head>
+    
     <body>
         <header>
             <h1>Shop - Feel Good Drinks Co.</h1>
@@ -57,7 +74,7 @@
                 		echo "<h3 class='card-title'>$name</h3>";
                 		echo "<h4 class='card-subtitle'>$size ml - $$price</h4>";
                 		echo "<p>$description</p>";
-                		echo "<a href='product.php?$id' class='btn btn-info'>More Info</a>";
+                		echo "<a href='product.php?id=$id' class='btn btn-info'>More Info</a>";
             		echo "</div>";
         		echo "</div>";
             }
@@ -65,9 +82,12 @@
         
 
         </main>
-        <footer>
-            
-        </footer>
+        
+        <?php
+            // Call echo_footer from tools.php to show footer
+            echo_footer();
+        ?>
+        
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -78,7 +98,7 @@
 
 <?php
 	// Release $result
-	//mysqli_free_result($result);
+	mysqli_free_result($result);
 	
 	// Close connection to database
 	mysqli_close($connection);
